@@ -22,7 +22,6 @@ Python 2.7.15rc1,
 Numpy 1.16.3
 
 **installing unusual things**
-
 <br />
 $pip install networkx<br />
 $apt install libopencv-dev python-opencv<br />
