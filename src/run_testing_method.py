@@ -27,7 +27,7 @@ tester = tester.Tester(radius_of_robot=1.)
 
 '''you can run this to see trivial output but make sure that you uncommented following line and delete the next one (you may also want to change 'create_video' to False) '''
 
-# times = np.loadtxt('../data/time_windows/testing_times.txt', dtype='int')
+# times = np.loadtxt('../data/time_windows/test_times.txt', dtype='int')
 times = [1554105948]
 model = 'WHyTeS'
 results = []
