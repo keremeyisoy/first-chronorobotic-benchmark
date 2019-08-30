@@ -8,12 +8,16 @@ The name of every grid for specific time is [time]_model.txt.
 Every time window is 40s long, and starts at the time listed in /data/test_times.txt.
 It is not necessary to run this tool by your own - but we would like to ask you to send us models for every time.
 
+
 **parameters of grid:**
 
 edges of cells: x...0.5 [m], y...0.5 [m], angle...pi/4.0 [rad]<br />
 number of cells: x...24, y...33, angles...8<br />
 center of "first" cell: (-9.5, 0.25, -3.0*pi/4.0)<br />
 center of "last" cell: (2.0, 16.25, pi) <br />
+
+**note:**
+files in /models/1_cluster_9_periods/ include another values, that are not used by this tool, so do not be frightened.
 
 
 **software used during developement:**
