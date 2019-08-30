@@ -28,8 +28,8 @@ tester = tester.Tester(radius_of_robot=1.)
 
 '''you can run this to see trivial output but make sure that you uncommented following line and delete the next one (you may also want to change 'create_video' to False) '''
 
-times = np.loadtxt('../data/test_times.txt', dtype='int')
-# times = [1554105954]
+# times = np.loadtxt('../data/test_times.txt', dtype='int')
+times = [1554105954]
 model = '1_cluster_9_periods'
 # model = 'WHyTeS'
 results = []
