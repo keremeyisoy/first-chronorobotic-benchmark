@@ -1,4 +1,15 @@
 # first-chronorobotic-benchmark
+
+** what to do **
+
+Please, create a list of weights in every cell for every time window.
+The name of every time window is <time>_model.txt.
+Every time window is 40s long, and starts at the time listed in /data/test_times.txt.
+
+
+
+** other things **
+
 <br />
 $pip install networkx<br />
 $apt install libopencv-dev python-opencv<br />
