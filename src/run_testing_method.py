@@ -1,5 +1,6 @@
 import numpy as np
 import tester
+import os
 
 """
 Before run this, please create new directories with your models name inside following directories; 'models' and 'results'
@@ -28,12 +29,21 @@ tester = tester.Tester(radius_of_robot=1.)
 '''you can run this to see trivial output but make sure that you uncommented following line and delete the next one (you may also want to change 'create_video' to False) '''
 
 # times = np.loadtxt('../data/test_times.txt', dtype='int')
-times = [1554105948]
-# model = '1_cluster_9_periods'
-model = 'WHyTeS'
+times = [1554105954]
+model = '1_cluster_9_periods'
+# model = 'WHyTeS'
 results = []
 edges_of_cell = [0.5, 0.5]
 speed = 1.
+
+try:
+    os.mkdir('../results/' + str(model))
+except OSError as error:
+    pass
+
+file_path = '../results/' + str(model) + '/output.txt'
+if os.path.exists(file_path):
+    os.remove(file_path)
 
 for time in times:
     path_model = '../models/' + model + '/' + str(time) + '_model.txt'
@@ -42,5 +52,5 @@ for time in times:
 
     result = tester.test_model(path_model=path_model, path_data=test_data_path, testing_time=time, model_name=model, edges_of_cell=edges_of_cell, speed=speed, create_video=False)
     results.append(result)
-
-np.savetxt('../results/' + str(model) + '/output.txt', np.array(results), fmt='%i %i %i %i %i %i %f %f %i')
+    with open(file_path, 'a') as file:
+        file.write(str(result))

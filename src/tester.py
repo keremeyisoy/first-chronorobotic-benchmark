@@ -21,6 +21,9 @@ class Tester:
         '''
         results = []
         test_data = np.loadtxt(path_data)
+        if test_data.ndim != 2:
+            return [int(testing_time), 0, 0, 0, 0, 0, 0, 0, 0]
+
         min_time = np.min(test_data[:, 0])
 
         number_of_detections = len(test_data[:, 0])

@@ -284,7 +284,7 @@ class PathFinder:
         self.interactions = []
         data = np.loadtxt(path)
         counter = 0
-        if len(data) == 0:
+        if data.ndim != 2:
             return 0
         for position in self.trajectory:
             x_robot = position[1]
