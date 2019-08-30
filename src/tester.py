@@ -22,6 +22,7 @@ class Tester:
         results = []
         test_data = np.loadtxt(path_data)
         min_time = np.min(test_data[:, 0])
+
         number_of_detections = len(test_data[:, 0])
         route = [(-5, 10), (2, 3), (-7, 1), (-5, 10)]           # clockwise route
         reverse_route = [(-5, 10), (-7, 1), (2, 3), (-5, 10)]   # counter-clockwise route

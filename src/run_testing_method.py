@@ -29,6 +29,7 @@ tester = tester.Tester(radius_of_robot=1.)
 
 # times = np.loadtxt('../data/test_times.txt', dtype='int')
 times = [1554105948]
+# model = '1_cluster_9_periods'
 model = 'WHyTeS'
 results = []
 edges_of_cell = [0.5, 0.5]
@@ -37,8 +38,9 @@ speed = 1.
 for time in times:
     path_model = '../models/' + model + '/' + str(time) + '_model.txt'
     test_data_path = '../data/time_windows/' + str(time) + '_test_data.txt'
+    print time
 
-    result = tester.test_model(path_model=path_model, path_data=test_data_path, testing_time=time, model_name=model, edges_of_cell=edges_of_cell, speed=speed, create_video=True)
+    result = tester.test_model(path_model=path_model, path_data=test_data_path, testing_time=time, model_name=model, edges_of_cell=edges_of_cell, speed=speed, create_video=False)
     results.append(result)
 
 np.savetxt('../results/' + str(model) + '/output.txt', np.array(results), fmt='%i %i %i %i %i %i %f %f %i')

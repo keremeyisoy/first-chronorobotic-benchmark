@@ -284,13 +284,13 @@ class PathFinder:
         self.interactions = []
         data = np.loadtxt(path)
         counter = 0
-
+        if len(data) == 0:
+            return 0
         for position in self.trajectory:
             x_robot = position[1]
             y_robot = position[2]
 
             indexes = np.where((position[0] - 0.5 < data[:, 0]) & (position[0] + 0.5 > data[:, 0]))
-
 
             for index in indexes[0]:
                 x_pedestrian = data[index, 1]
