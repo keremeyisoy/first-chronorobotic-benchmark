@@ -332,6 +332,15 @@ class PathFinder:
 
         return total_weight
 
+    def get_mean_path_weight(self):
+        total_weight = 0.
+        for i in xrange(len(self.shortest_path)-1):
+            weight = self.graph.get_edge_data(self.shortest_path[i], self.shortest_path[i+1])
+            if weight != None:
+                total_weight += weight['weight']
+
+        return total_weight/len(self.shortest_path)
+
 
 if __name__ == "__main__":
 
