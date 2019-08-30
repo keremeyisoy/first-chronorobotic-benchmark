@@ -26,7 +26,7 @@ Since this code is prepared in a short time for scientific reasons, sorry in adv
 tester = tester.Tester(radius_of_robot=1.)
 
 
-'''you can run this to see trivial output but make sure that you uncommented following line and delete the next one (you may also want to change 'create_video' to False) '''
+'''you can run this to see trivial output. If you want to run this for your model, make sure that you uncommented following line and delete the next one (you may also want to change 'create_video' to False) '''
 
 # times = np.loadtxt('../data/test_times.txt', dtype='int')
 times = [1554105954]
@@ -48,7 +48,7 @@ if os.path.exists(file_path):
 for time in times:
     path_model = '../models/' + model + '/' + str(time) + '_model.txt'
     test_data_path = '../data/time_windows/' + str(time) + '_test_data.txt'
-    print time
+    # print time
 
     result = tester.test_model(path_model=path_model, path_data=test_data_path, testing_time=time, model_name=model, edges_of_cell=edges_of_cell, speed=speed, create_video=False)
     results.append(result)
