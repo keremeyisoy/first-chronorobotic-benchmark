@@ -3,7 +3,7 @@
 **what to do**
 
 Please, create a list of weights in every cell for every time window (similarly to /models/WHyTeS/1554105948_model.txt ).
-The list of every position in in file /data/positions.txt and you should assign every weight to correct cell.
+The list of every position is in the file /data/positions.txt and you should assign every weight to correct cell.
 The name of every grid for specific time is <time>_model.txt.
 Every time window is 40s long, and starts at the time listed in /data/test_times.txt.
 It is not necessary to run this tool by your own - but we would like to ask you to send us models for every time.
