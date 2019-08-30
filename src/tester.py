@@ -81,7 +81,7 @@ class Tester:
             path_trajectory = '../results/trajectory.txt'
             path_interactions = '../results/interactions.txt'
             vm = make_video.VideoMaker(path_data=path_data, path_borders=path_borders, path_trajectory=path_trajectory, path_interactions=path_interactions)
-            vm.make_video(str(model_name) + '/time_windows/' + str(testing_time), with_robot=True, radius_of_robot=self.radius_of_robot)
+            vm.make_video(str(model_name) + '/' + str(testing_time), with_robot=True, radius_of_robot=self.radius_of_robot)
 
         return results
 
