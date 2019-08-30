@@ -3,7 +3,7 @@
 $pip install networkx<br />
 $apt install libopencv-dev python-opencv<br />
 $python run_testing_method.py<br />
-
+<br /><br />
 
 Before run this, please create new directories with your models name inside following directories; 'models' and 'results'
 and, change the variable 'model' in run_testing_method.py with the same name of the directories you created.
