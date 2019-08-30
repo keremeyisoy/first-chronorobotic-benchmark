@@ -24,3 +24,8 @@ outputs will be written in ../results/$model/output.txt in following format;<br 
 list of values; [testing_time, number_of_detections_in_testing_data, interactions_of_dummy_model_clockwise, interactions_of_dummy_model_counterclockwise, interactions_of_real_model_clockwise, interactions_of_real_model_counterclockwise, total_weight_in_clockwise, total_weight_in_counterclockwise, total_interactions_of_chosen_trajectory]<br />
 <br />
 Since this code is prepared in a short time for scientific reasons, sorry in advance for any ambiguity
+
+**software used during developement:**
+Ubuntu 18.04,
+Python 2.7.15rc1,
+Numpy 1.16.3
