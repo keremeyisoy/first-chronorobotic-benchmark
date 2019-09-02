@@ -1,6 +1,7 @@
 import numpy as np
 import path_finder as pf
 import make_video
+import warnings
 
 
 class Tester:
@@ -20,13 +21,19 @@ class Tester:
         :return: list of values; [testing_time, number_of_detections_in_testing_data, interactions_of_dummy_model_clockwise, interactions_of_dummy_model_counterclockwise, interactions_of_real_model_clockwise, interactions_of_real_model_counterclockwise, total_weight_in_clockwise, total_weight_in_counterclockwise, total_interactions_of_chosen_trajectory]
         '''
         results = []
-        test_data = np.loadtxt(path_data)
-        if test_data.ndim != 2:
-            return [int(testing_time), 0, 0, 0, 0, 0, 0, 0, 0]
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            test_data = np.loadtxt(path_data)
+        # min_time = np.min(test_data[:, 0])
+        min_time = testing_time
+        
+        if test_data.ndim == 2:
+            number_of_detections = len(np.unique(test_data[:, 7]))
+        elif test_data.ndim == 1 and len(test_data) == 8:
+            number_of_detections = 1
+        else:
+            number_of_detections = 0
 
-        min_time = np.min(test_data[:, 0])
-
-        number_of_detections = len(test_data[:, 0])
         route = [(-5, 10), (2, 3), (-7, 1), (-5, 10)]           # clockwise route
         reverse_route = [(-5, 10), (-7, 1), (2, 3), (-5, 10)]   # counter-clockwise route
         path_borders = '../data/artificial_boarders_of_space_in_UTBM.txt'

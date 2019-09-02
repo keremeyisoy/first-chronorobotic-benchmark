@@ -28,10 +28,9 @@ tester = tester.Tester(radius_of_robot=1.)
 
 '''you can run this to see trivial output. If you want to run this for your model, make sure that you uncommented following line and delete the next one (you may also want to change 'create_video' to False) '''
 
-times = np.loadtxt('../data/test_times.txt', dtype='int')
-# times = [1554105954]
+# times = np.loadtxt('../data/test_times.txt', dtype='int')
+times = [1554105954]
 models = ['1_cluster_9_periods']
-# models = ['2_clusters_1_periodicities', '2_clusters_2_periodicities', '2_clusters_3_periodicities', '2_clusters_4_periodicities', '2_clusters_5_periodicities', '2_clusters_6_periodicities', '4_clusters_1_periodicities', '4_clusters_2_periodicities']
 edges_of_cell = [0.5, 0.5]
 speed = 1.
 

@@ -1,6 +1,7 @@
 import networkx
 from networkx.exception import NetworkXError
 import numpy as np
+import warnings
 
 
 class PathFinder:
@@ -282,7 +283,9 @@ class PathFinder:
 
     def extract_interactions(self, path, radius):
         self.interactions = []
-        data = np.loadtxt(path)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            data = np.loadtxt(path)
         counter = 0
         if data.ndim != 2:
             return 0
