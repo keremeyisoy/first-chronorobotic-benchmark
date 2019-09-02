@@ -1,5 +1,6 @@
 import numpy as np
 import tester
+import summarize
 import os
 
 """
@@ -29,13 +30,13 @@ tester = tester.Tester(radius_of_robot=1.)
 '''you can run this to see trivial output. If you want to run this for your model, make sure that you uncommented following line and delete the next one (you may also want to change 'create_video' to False) '''
 
 # times = np.loadtxt('../data/test_times.txt', dtype='int')
-times = [1554105954]
+times = [1554092829, 1554105954]
 models = ['1_cluster_9_periods']
 edges_of_cell = [0.5, 0.5]
 speed = 1.
 
 for model in models:
-    print model
+    print 'testing  ' + model
     try:
         os.mkdir('../results/' + str(model))
     except OSError as error:
@@ -54,3 +55,7 @@ for model in models:
         with open(file_path, 'a') as file:
             file.write(' '.join(str(value) for value in result) + '\n')
 
+for model in models:
+
+    file_path = '../results/' + str(model) + '/' + str(model) + '_output.txt'
+    summarize.summarize('../results/' + str(model) + '/' + str(model) + '_output.txt')
