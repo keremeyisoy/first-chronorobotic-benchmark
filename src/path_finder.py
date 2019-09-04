@@ -58,12 +58,18 @@ class PathFinder:
         real_dst = self.get_real_coordinate(dst[0], dst[1])
         k = 0
 
-        while k < len(self.model[:, 0]):
-            if self.model[k, 0] == real_dst[0] and self.model[k, 1] == real_dst[1] and self.model[k, 2] == angle:
-                return self.model[k, 3]
-            k += 1
-        return 10000
-
+        #while k < len(self.model[:, 0]):
+        #    if self.model[k, 0] == real_dst[0] and self.model[k, 1] == real_dst[1] and self.model[k, 2] == angle:
+        #        return self.model[k, 3]
+        #    k += 1
+        #return 10000
+        a = self.model[(self.model[:, 0] == real_dst[0]) & (self.model[:, 1] == real_dst[1]) & (self.model[:, 2] == angle), 3]
+        if len(a) != 1:
+            return 10000
+        else:
+            return float(a)
+        
+        
     def creat_graph(self, dummy=False):
         self.graph = networkx.DiGraph()
         directions = [0, np.pi / 4, np.pi / 2, 3 * np.pi / 4, np.pi, -3 * np.pi / 4, -np.pi / 2, -np.pi / 4]
