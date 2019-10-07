@@ -1,5 +1,7 @@
 # first-chronorobotic-benchmark
 
+git clone -b developement --single-branch https://github.com/keremeyisoy/first-chronorobotic-benchmark
+
 **what to do**
 
 Please, create a list of weights in every cell for every time window (similarly to /models/WHyTeS/1554105948_model.txt ).
