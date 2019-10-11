@@ -2,6 +2,7 @@ import numpy as np
 import path_finder as pf
 import make_video
 import warnings
+from time import time
 
 
 class Tester:
@@ -20,6 +21,7 @@ class Tester:
         :param create_video: create a video of trajectory if it is True
         :return: list of values; [testing_time, number_of_detections_in_testing_data, interactions_of_dummy_model_clockwise, interactions_of_dummy_model_counterclockwise, interactions_of_real_model_clockwise, interactions_of_real_model_counterclockwise, total_weight_in_clockwise, total_weight_in_counterclockwise, total_interactions_of_chosen_trajectory]
         '''
+        start = time()
         results = []
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -42,43 +44,80 @@ class Tester:
         results.append(number_of_detections)
 
         path_finder = pf.PathFinder(path=path_model, edges_of_cell=edges_of_cell)
+        finish = time()
+        print('first part: ' + str(finish-start))
 
         '''
         Dummy Model
         '''
+        """
         # clockwise
         path_finder.creat_graph(dummy=True)
         path_finder.remove_walls(walls)
         path_finder.find_shortest_path(route=route)
         path_finder.extract_trajectory(min_time, speed=speed)
 
-        results.append(path_finder.extract_interactions(path_data, radius=self.radius_of_robot))
+        results.append(path_finder.extract_interactions(test_data, radius=self.radius_of_robot))
 
         # counter-clockwise
         path_finder.find_shortest_path(route=reverse_route)
         path_finder.extract_trajectory(min_time, speed=speed)
-        results.append(path_finder.extract_interactions(path_data, radius=self.radius_of_robot))
+        results.append(path_finder.extract_interactions(test_data, radius=self.radius_of_robot))
+        """
 
 
         '''
         Real Model
         '''
+        start = time()
+
+
+        #start = time()
         path_finder.creat_graph()
+        #finish = time()
+        #print('creat_graph')
+        #print(finish-start)
+
+        #start = time()
         path_finder.remove_walls(walls)
+        #finish = time()
+        #print('remove_walls')
+        #print(finish-start)
+
+        #start = time()
 
         # clockwise
         path_finder.find_shortest_path(route=route)
+        #finish = time()
+        #print('find_shortest_path')
+        #print(finish-start)
+
+        #start = time()
         weight_1 = path_finder.get_mean_path_weight()
+        #finish = time()
+        #print('get_mean_path_weight')
+        #print(finish-start)
+
+        #start = time()
 
         path_finder.extract_trajectory(min_time, speed=speed)
-        result_1 = path_finder.extract_interactions(path_data, radius=self.radius_of_robot)
+        #finish = time()
+        #print('extract_trajectory')
+        #print(finish-start)
+
+        #start = time()
+        result_1 = path_finder.extract_interactions(test_data, radius=self.radius_of_robot)
         results.append(result_1)
+        #finish = time()
+        #print('extract_interactions')
+        #print(finish-start)
+
 
         # counter-clockwise
         path_finder.find_shortest_path(route=reverse_route)
         weight_2 = path_finder.get_mean_path_weight()
         path_finder.extract_trajectory(min_time, speed=speed)
-        result_2 = path_finder.extract_interactions(path_data, radius=self.radius_of_robot)
+        result_2 = path_finder.extract_interactions(test_data, radius=self.radius_of_robot)
         results.append(result_2)
         results.append(weight_1)
         results.append(weight_2)
@@ -87,6 +126,9 @@ class Tester:
             results.append(result_1)
         else:
             results.append(result_2)
+        
+        finish = time()
+        print('second part: ' + str(finish-start))
 
         if create_video:
             path_trajectory = '../results/trajectory.txt'
@@ -101,4 +143,4 @@ if __name__ == "__main__":
 
     tester = Tester(radius_of_robot=1.)
     edges_of_cell = np.array([0.5, 0.5])
-    print tester.test_model('../models/WHyTeS/1554105948_model.txt', '../data/time_windows/1554105948_test_data.txt', testing_time=1554105948, model_name='WHyTeS', edges_of_cell=edges_of_cell, speed=1.0, create_video=False)
+    print tester.test_model('../models/1_cluster_9_periods/1554105994_model.txt', '../data/time_windows/1554105994_test_data.txt', testing_time=1554105994, model_name='WHyTeS', edges_of_cell=edges_of_cell, speed=1.0, create_video=False)

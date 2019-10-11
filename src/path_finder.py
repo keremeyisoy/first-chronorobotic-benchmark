@@ -73,6 +73,7 @@ class PathFinder:
     def creat_graph(self, dummy=False):
         self.graph = networkx.DiGraph()
         directions = [0, np.pi / 4, np.pi / 2, 3 * np.pi / 4, np.pi, -3 * np.pi / 4, -np.pi / 2, -np.pi / 4]
+        longer_path = np.sqrt(2.0)
         shape = self.shape
         for i in xrange(shape[0]):
             for j in xrange(shape[1]):
@@ -94,16 +95,16 @@ class PathFinder:
 
                     # upper right neighbor
                     dst = (i - 1, j + 1)
-                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[5], dummy))
+                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[5], dummy)*longer_path)
                     # lower right neighbor
                     dst = (i + 1, j + 1)
-                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[3], dummy))
+                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[3], dummy)*longer_path)
                     # upper left neighbor
                     dst = (i - 1, j - 1)
-                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[7], dummy))
+                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[7], dummy)*longer_path)
                     # lower left neighbor
                     dst = (i + 1, j - 1)
-                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[1], dummy))
+                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[1], dummy)*longer_path)
 
                 elif i == 0 and j == shape[1]-1:    # top right corner
                     # left neighbor
@@ -114,7 +115,7 @@ class PathFinder:
                     self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[2], dummy))
                     # lower left neighbor
                     dst = (i + 1, j - 1)
-                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[1], dummy))
+                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[1], dummy)*longer_path)
 
                 elif i == 0 and j == 0:    # top left corner
                     # right neighbor
@@ -125,7 +126,7 @@ class PathFinder:
                     self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[2], dummy))
                     # lower right neighbor
                     dst = (i + 1, j + 1)
-                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[3], dummy))
+                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[3], dummy)*longer_path)
 
                 elif i == shape[0]-1 and j == shape[1]-1:    # bottom right corner
                     # upper neighbor
@@ -136,7 +137,7 @@ class PathFinder:
                     self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[0], dummy))
                     # upper left neighbor
                     dst = (i - 1, j - 1)
-                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[7], dummy))
+                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[7], dummy)*longer_path)
 
                 elif i == shape[0]-1 and j == 0:    # bottom left corner
                     # upper neighbor
@@ -147,7 +148,7 @@ class PathFinder:
                     self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[4], dummy))
                     # upper right neighbor
                     dst = (i - 1, j + 1)
-                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[5], dummy))
+                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[5], dummy)*longer_path)
 
                 elif i == 0:    # top border
                     # left neighbor
@@ -161,10 +162,10 @@ class PathFinder:
                     self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[2], dummy))
                     # lower left neighbor
                     dst = (i + 1, j - 1)
-                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[1], dummy))
+                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[1], dummy)*longer_path)
                     # lower right neighbor
                     dst = (i + 1, j + 1)
-                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[3], dummy))
+                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[3], dummy)*longer_path)
 
                 elif i == shape[0]-1:    # bottom border
                     # left neighbor
@@ -178,10 +179,10 @@ class PathFinder:
                     self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[6], dummy))
                     # upper right neighbor
                     dst = (i - 1, j + 1)
-                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[5], dummy))
+                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[5], dummy)*longer_path)
                     # upper left neighbor
                     dst = (i - 1, j - 1)
-                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[7], dummy))
+                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[7], dummy)*longer_path)
 
                 elif j == shape[1]-1:   # right border
                     # left neighbor
@@ -195,10 +196,10 @@ class PathFinder:
                     self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[2], dummy))
                     # upper left neighbor
                     dst = (i - 1, j - 1)
-                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[7], dummy))
+                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[7], dummy)*longer_path)
                     # lower left neighbor
                     dst = (i + 1, j - 1)
-                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[1], dummy))
+                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[1], dummy)*longer_path)
 
                 elif j == 0:    # left border
                     # right neighbor
@@ -212,10 +213,10 @@ class PathFinder:
                     self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[2], dummy))
                     # upper right neighbor
                     dst = (i - 1, j + 1)
-                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[5], dummy))
+                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[5], dummy)*longer_path)
                     # lower right neighbor
                     dst = (i + 1, j + 1)
-                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[3], dummy))
+                    self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[3], dummy)*longer_path)
 
         return
 
@@ -287,15 +288,26 @@ class PathFinder:
 
         return self.shortest_path
 
-    def extract_interactions(self, path, radius):
-        self.interactions = []
+    #def extract_interactions(self, path, radius):
+    def extract_interactions(self, data, radius):
+        from time import time
+        #self.interactions = []
+        self.interactions = np.empty((0, 5))
+        """
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
+            start = time()
             data = np.loadtxt(path)
+            finish = time()
+            print('load: ' + str(finish-start))
+        """
         counter = 0
         if data.ndim != 2:
             return 0
+
+        start = time()
         for position in self.trajectory:
+            """
             x_robot = position[1]
             y_robot = position[2]
 
@@ -308,9 +320,31 @@ class PathFinder:
                 if dist <= radius:
                     self.interactions.append((data[index, 0], data[index, 1], data[index, 2], data[index, 7], 3))
                     counter += 1
+            """
+            tmp = (position[0] - 0.5 < data[:, 0]) & (position[0] + 0.5 > data[:, 0])
+            no = np.sum(tmp)
+            if no > 0:
+                if no > 1:
+                    tmp = data[tmp, :]
+                    tmp = tmp[:, [0, 1, 2, 7]]
+                    dists = np.sqrt(np.sum((tmp[:, 1:3] - position[1:3])**2, axis=1))
+                    tmp = tmp[dists <= radius, :]
+                    tmp = np.c_[tmp, np.ones(len(tmp))*3]
+                    self.interactions = np.r_[self.interactions, tmp]
+                else:
+                    tmp = data[tmp, [0, 1, 2, 7]]
+                    #print(np.shape(tmp))
+                    dists = np.sqrt(np.sum((tmp[1:3] - position[1:3])**2))
+                    if dists<= radius:
+                        tmp = np.r_[tmp, 3]
+                        self.interactions = np.r_[self.interactions, tmp]
+            
+
+        finish = time()
+        #print('sileny loop: ' + str(finish-start))
 
         np.savetxt('../results/interactions.txt', np.array(self.interactions))
-
+        counter = len(self.interactions)
         if counter > 0:
             # return counter
             return len(np.unique(np.array(self.interactions)[:, 3]))
