@@ -2,18 +2,32 @@ import networkx
 from networkx.exception import NetworkXError
 import numpy as np
 import warnings
+import pandas as pd
+from time import time, clock
+
+
+
+
+
+
+
 
 
 class PathFinder:
 
-    def __init__(self, path, edges_of_cell):
-        self.model = np.loadtxt(path)
+    def __init__(self, model_data, edges_of_cell):
+        #self.model = np.loadtxt(path)
+        #self.model = pd.read_csv(path, sep=' ', header=None, engine='c', float_precision='round-trip').values.copy()#, memory_map=True).values#, float_precision='round-trip' returns exatly what numpy
+        self.model = model_data  # formerly path
+        #print(np.array_equal(self.model, self.model_1))
+        #print(self.model)
+        #print(self.model_1)
         self.edges_of_cell = edges_of_cell
         self.graph = networkx.DiGraph()
         self.shortest_path = []
         self.shortest_path_real = None
         self.trajectory = None
-        self.interactions = []
+        #self.interactions = []
         self.x_min = -9.25
         self.x_max = 3.0
         self.y_min = 0.0
@@ -68,9 +82,40 @@ class PathFinder:
             return 10000
         else:
             return float(a)
+
+    def prepare_graph(self):
         
+        rounding_error = 0.0001
+        angles = self.model[:, 2]
+        # changing real coordinates to indexes (dunno y)
+        # from "get_indexes" (int((self.y_max-y)/y_length+1), int((x - self.x_min)/x_length+1))
+        x = ((self.model[:, 0] - self.x_min)/self.edges_of_cell[0]+1).astype(int)
+        y = ((self.y_max-self.model[:, 1])/self.edges_of_cell[1]+1).astype(int)
+        # for every x, y, angle we have a weight
+        # x, y here is destination node
+        # from angle, we are looking for source node
+        # assuming 8 possible directions from source to destination node 
+        xr = (angles > rounding_error-np.pi/2.0) & (angles < -rounding_error+np.pi/2.0)  # x rises
+        xf = (angles < -rounding_error-np.pi/2.0) | (angles > rounding_error+np.pi/2.0)  # x falls
+        yr = (angles > rounding_error+0.0) & (angles < -rounding_error+np.pi)  # y rises
+        yf = (angles < -rounding_error+0.0) & (angles > rounding_error-np.pi)  # y falls
+        dg = (xr & yr) | (xr & yf) | (xf & yr) | (xf & yf)  # diagonal edge
+        # creating weights and tuples - for some reason, changing from x,y to y,x :)
+        # the reason is visualisation...
+        src = list(zip(y + yr - yf, x + xr - xf))  # source node
+        # weights - diagonal ones should be rised by np.sqrt(2.0)
+        wgt = self.model[:, 3] * (1.0+dg*(np.sqrt(2.0)-1.0))
+        df = pd.DataFrame()
+        df[0] = src  # source node
+        df[1] = list(zip(y, x))  # destination node
+        df['weight'] = wgt
+        self.graph = networkx.from_pandas_edgelist(df, 0, 1, 'weight', create_using=networkx.DiGraph)
+        
+
         
     def creat_graph(self, dummy=False):
+        self.prepare_graph()
+        """
         self.graph = networkx.DiGraph()
         directions = [0, np.pi / 4, np.pi / 2, 3 * np.pi / 4, np.pi, -3 * np.pi / 4, -np.pi / 2, -np.pi / 4]
         longer_path = np.sqrt(2.0)
@@ -219,16 +264,20 @@ class PathFinder:
                     self.graph.add_edge(src, dst, weight=self.get_weight(dst, directions[3], dummy)*longer_path)
 
         return
+        """
 
     def remove_walls(self, walls):
+        x = ((walls[:, 0] - self.x_min)/self.edges_of_cell[0]+1).astype(int)
+        y = ((self.y_max-walls[:, 1])/self.edges_of_cell[1]+1).astype(int)
+        self.graph.remove_nodes_from(list(zip(y, x)))
 
-        for position in walls:
-            row, column = self.get_index(position[0], position[1])
-            try:
-                self.graph.remove_node((row, column))
-            except NetworkXError:
-                pass
-        return
+        #for position in walls:
+        #    row, column = self.get_index(position[0], position[1])
+        #    try:
+        #        self.graph.remove_node((row, column))
+        #    except NetworkXError:
+        #        pass
+        #return
 
     def extract_path(self):
         positions = np.zeros((len(self.shortest_path), 2))
@@ -241,7 +290,7 @@ class PathFinder:
         np.savetxt('../results/path.txt', positions)
         return positions
 
-    def extract_trajectory(self, start_time, speed):
+    def extract_trajectory(self, start_time, speed, create_video=False, time_step=0.1):
         self.trajectory = []
         time = start_time
 
@@ -253,7 +302,7 @@ class PathFinder:
 
             x = self.shortest_path_real[i - 1, 0]
             y = self.shortest_path_real[i - 1, 1]
-            times = np.arange(time, time_next, 0.1)
+            times = np.arange(time, time_next, time_step)
             # print time_next - time
             x_step = (self.shortest_path_real[i, 0] - x)/len(times)
             y_step = (self.shortest_path_real[i, 1] - y)/len(times)
@@ -263,8 +312,8 @@ class PathFinder:
                 self.trajectory.append((t, x, y, 2, 2))
 
             time = time_next
-
-        np.savetxt('../results/trajectory.txt', np.array(self.trajectory))
+        if create_video:
+            np.savetxt('../results/trajectory.txt', np.array(self.trajectory))
         return self.trajectory
 
     def find_shortest_path(self, route):
@@ -276,12 +325,20 @@ class PathFinder:
                 dst = self.get_index(route[i][0], route[i][1])
                 self.shortest_path.extend(list(networkx.dijkstra_path(self.graph, src, dst)))
 
-            self.shortest_path_real = np.zeros((len(self.shortest_path), 2))
+            # from  get_real_coordinate: (self.x_min + x_length*column - x_length*0.5, self.y_max - y_length*row + y_length*0.5)
+            self.shortest_path_real = np.array(self.shortest_path, dtype=np.float64)
+            self.shortest_path_real[:,0] = self.y_max - self.edges_of_cell[1]*self.shortest_path_real[:,0] + self.edges_of_cell[1]*0.5
+            self.shortest_path_real[:,1] = self.x_min + self.edges_of_cell[0]*self.shortest_path_real[:,1] - self.edges_of_cell[0]*0.5
+            self.shortest_path_real = self.shortest_path_real[:,::-1]
+            #print(self.shortest_path_real)
+            #self.shortest_path_real = np.zeros((len(self.shortest_path), 2))
 
-            for i in xrange(len(self.shortest_path)):
-                x, y = self.get_real_coordinate(self.shortest_path[i][0], self.shortest_path[i][1])
-                self.shortest_path_real[i, 0] = x
-                self.shortest_path_real[i, 1] = y
+            #for i in xrange(len(self.shortest_path)):
+            #    x, y = self.get_real_coordinate(self.shortest_path[i][0], self.shortest_path[i][1])
+            #    self.shortest_path_real[i, 0] = x
+            #    self.shortest_path_real[i, 1] = y
+            #print(self.shortest_path_real)
+                
 
         except networkx.NetworkXError:
             print "no path!"
@@ -289,10 +346,10 @@ class PathFinder:
         return self.shortest_path
 
     #def extract_interactions(self, path, radius):
-    def extract_interactions(self, data, radius):
-        from time import time
-        #self.interactions = []
-        self.interactions = np.empty((0, 5))
+    def extract_interactions(self, data, radius, create_video=False, time_step=0.1):
+        #from time import time
+        interactions = []
+        #self.interactions = np.empty((0, 5))
         """
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -305,8 +362,87 @@ class PathFinder:
         if data.ndim != 2:
             return 0
 
-        start = time()
-        for position in self.trajectory:
+        # once through the data (against filtering in every iteration) - should be rewritten to cython, or something
+        #start = time()
+            
+        rob_pos = 0
+        list_of_time_windows = []
+        time_window = []
+        no_robot_steps = len(self.trajectory)
+        #print(data[0][0])
+        #print(self.trajectory[rob_pos][0])
+        for human in data:
+        #for i in xrange(len(data)):
+            #human = data[i, :]
+            if human[0] < self.trajectory[rob_pos][0] - time_step*0.5:
+                #print('robot tu neni, clovek: ' + str(human[0]))
+                #print('neukladam nic, dalsi clovek')
+                continue
+            elif self.trajectory[rob_pos][0] + time_step*0.5 >= human[0]:
+                #print('jsou tu oba, robot: ' + str(self.trajectory[rob_pos][0]))
+                #print('jsou tu oba, clovek: ' + str(human[0]))
+                #print('zvetsuji time window, dalsi clovek')
+                time_window.append(human)
+                continue
+            elif len(time_window) > 0:
+                #print('byli tu spolu, clovek je tu po robotovi, ukladam a nuluji time window')
+                #print('je to tento clovek: ' + str(human[0]))
+                #list_of_time_windows.append(np.array(time_window))
+                list_of_time_windows.append(time_window)
+                time_window = []
+                #print('casove dalsi robot prichazi')
+                rob_pos += 1
+
+            if rob_pos >= no_robot_steps:
+                #print('robot uz skoncil, koncim take')
+                break
+            #else:
+                #print('prisel tento robot: ' + str(self.trajectory[rob_pos][0]))
+
+            robot_finished = False
+            while self.trajectory[rob_pos][0] + time_step*0.5 < human[0]:
+                #print('clovek tu neni, robot: ' + str(self.trajectory[rob_pos][0]))
+                #print('ukladam prazdnou matici')
+                #list_of_time_windows.append(np.array([]))
+                #list_of_time_windows.append([])
+                list_of_time_windows.append(time_window)
+                #print('casove dalsi robot prichazi')
+                rob_pos += 1
+                if rob_pos >= no_robot_steps:
+                    #print('robot uz skoncil, koncim take')
+                    robot_finished = True
+                    break
+
+            if robot_finished:
+                break
+            else:
+                #print('uz jsou tu zase oba spolu, zvetsuji time_window, jdu na dalsiho cloveka')
+                #print('jsou tu oba, robot: ' + str(self.trajectory[rob_pos][0]))
+                #print('jsou tu oba, clovek: ' + str(human[0]))
+                time_window.append(human)
+                
+        if len(time_window) > 0:
+            #print('v poslednim kromu byli oba, musim ulozit posledni plny time window a poslat dalsiho robota')
+            rob_pos += 1
+            #list_of_time_windows.append(np.array(time_window))
+            list_of_time_windows.append(time_window)
+            time_window = []
+            #print(rob_pos)
+            #print(no_robot_steps)
+            while rob_pos < no_robot_steps:
+                #print('uz tu zadny clovek nebude, robot: ' + str(self.trajectory[rob_pos][0]))
+                #print('ukladam prazdnou matici')
+                #list_of_time_windows.append(np.array([]))
+                #list_of_time_windows.append([])
+                list_of_time_windows.append(time_window)
+                #print('casove dalsi robot prichazi')
+                rob_pos += 1
+
+
+        while False:
+        #for position in self.trajectory:  # numpy version
+            #tmp = (position[0] - time_step*0.5 < data[:, 0]) & (position[0] + time_step*0.5 > data[:, 0])  # numpy version
+            #no = np.sum(tmp)  # numpy version
             """
             x_robot = position[1]
             y_robot = position[2]
@@ -321,33 +457,53 @@ class PathFinder:
                     self.interactions.append((data[index, 0], data[index, 1], data[index, 2], data[index, 7], 3))
                     counter += 1
             """
-            tmp = (position[0] - 0.5 < data[:, 0]) & (position[0] + 0.5 > data[:, 0])
-            no = np.sum(tmp)
+        #print(len(self.trajectory))
+        #print(len(list_of_time_windows))
+
+        for idx, position in enumerate(self.trajectory):  # hypothetical cython version
+            #tmp = list_of_time_windows[idx]  # hypothetical cython version
+            tmp = np.array(list_of_time_windows[idx])  # hypothetical cython version
+            no = np.shape(tmp)[0]  # hypothetical cython version
+
             if no > 0:
-                if no > 1:
-                    tmp = data[tmp, :]
-                    tmp = tmp[:, [0, 1, 2, 7]]
+                #if no > 1:  # numpy version
+                if len(np.shape(tmp)) == 2:  # hypothetical cython version
+                    #tmp = data[tmp, :]  # numpy version
+                    #tmp = tmp[:, [0, 1, 2, 7]]
                     dists = np.sqrt(np.sum((tmp[:, 1:3] - position[1:3])**2, axis=1))
                     tmp = tmp[dists <= radius, :]
-                    tmp = np.c_[tmp, np.ones(len(tmp))*3]
-                    self.interactions = np.r_[self.interactions, tmp]
+                    #tmp = np.c_[tmp, np.ones(len(tmp))*3]
+                    #self.interactions = np.r_[self.interactions, tmp]
+                    interactions.append(tmp)
                 else:
-                    tmp = data[tmp, [0, 1, 2, 7]]
+                    #tmp = data[tmp, [0, 1, 2, 7]]
+                    #tmp = data[tmp, :]  # numpy version
+                    #print(tmp)
                     #print(np.shape(tmp))
-                    dists = np.sqrt(np.sum((tmp[1:3] - position[1:3])**2))
+                    dists = np.sqrt(np.sum((tmp[:,1:3] - position[1:3])**2))
                     if dists<= radius:
-                        tmp = np.r_[tmp, 3]
-                        self.interactions = np.r_[self.interactions, tmp]
-            
-
-        finish = time()
+                        #tmp = np.r_[tmp, 3]
+                        #self.interactions = np.vstack([self.interactions, tmp])
+                        interactions.append(tmp)
+        #finish = time()
         #print('sileny loop: ' + str(finish-start))
+            
+        #start = time()
+        if interactions != []:
+            interactions = np.vstack(interactions)
+        #finish = time()
+        #print('vstack: ' + str(finish-start))
+        
 
-        np.savetxt('../results/interactions.txt', np.array(self.interactions))
-        counter = len(self.interactions)
+        if create_video:
+            #np.savetxt('../results/interactions.txt', np.array(self.interactions))
+            np.savetxt('../results/interactions.txt', np.array(interactions))
+        #counter = len(self.interactions)
+        counter = len(interactions)
         if counter > 0:
             # return counter
-            return len(np.unique(np.array(self.interactions)[:, 3]))
+            #return len(np.unique(np.array(self.interactions)[:, 3]))
+            return len(np.unique(np.array(interactions)[:, 3]))
         else:
             return 0
 
