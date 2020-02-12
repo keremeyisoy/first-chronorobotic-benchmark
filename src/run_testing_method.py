@@ -1,6 +1,7 @@
 import numpy as np
 import tester
 import summarize
+import summarize_new
 import os
 
 """
@@ -58,4 +59,5 @@ for model in models:
 for model in models:
 
     file_path = '../results/' + str(model) + '/' + str(model) + '_output.txt'
-    summarize.summarize('../results/' + str(model) + '/' + str(model) + '_output.txt')
+    #summarize.summarize('../results/' + str(model) + '/' + str(model) + '_output.txt')
+    summarize_new.summarize('../results/' + str(model) + '/' + str(model) + '_output.txt')

@@ -1,5 +1,6 @@
 import numpy as np
-import path_finder as pf
+#import path_finder as pf
+import path_finder_new as pf
 import make_video
 #import warnings
 from time import time
@@ -63,8 +64,10 @@ class Tester:
         else:
             number_of_detections = 0
 
-        route = [(-5, 10), (2, 3), (-7, 1), (-5, 10)]           # clockwise route
-        reverse_route = [(-5, 10), (-7, 1), (2, 3), (-5, 10)]   # counter-clockwise route
+        #route = [(-5, 10), (2, 3), (-7, 1), (-5, 10)]           # clockwise route
+        #reverse_route = [(-5, 10), (-7, 1), (2, 3), (-5, 10)]   # counter-clockwise route
+        route = np.array([(-5.0, 9.75), (2.0, 2.75), (-7.0, 0.75), (-5.0, 9.75)])           # clockwise route
+        reverse_route = np.array([(-5.0, 9.75), (-7.0, 0.75), (2.0, 2.75), (-5.0, 9.75)])   # counter-clockwise route
         path_borders = '../data/artificial_boarders_of_space_in_UTBM.txt'
         #walls = np.loadtxt(path_borders)
         #walls = pd.read_csv(path_borders, sep=' ', header=None, engine='c', float_precision='round_trip').values#float_precision='round-trip' returns exatly what numpy
