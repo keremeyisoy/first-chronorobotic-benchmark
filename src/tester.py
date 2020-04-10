@@ -46,7 +46,7 @@ class Tester:
             #print(np.allclose(test_data,test_data_2))
         try:
             #test_data = pd.read_csv(path_data, sep=' ', header=None, engine='c', float_precision='round_trip', usecols=[0, 1, 2, 7]).values#float_precision='round-trip' returns exatly what numpy
-            test_data = pd.read_csv(path_data, sep=' ', header=None, engine='c', usecols=[0, 1, 2, 7]).values#float_precision='round-trip' returns exatly what numpy
+            test_data = pd.read_csv(path_data, sep=' ', header=None, engine='c', usecols=[0, 1, 2, 6, 7]).values#float_precision='round-trip' returns exatly what numpy
         #except pd.parser.CParserError:
         except pandas.io.common.EmptyDataError:
             test_data = np.array([])
@@ -59,7 +59,7 @@ class Tester:
             test_data = test_data[test_data[:,0].argsort(kind='mergesort')]
             number_of_detections = len(np.unique(test_data[:, -1]))
         #elif test_data.ndim == 1 and len(test_data) == 8:
-        elif test_data.ndim == 1 and len(test_data) == 4:
+        elif test_data.ndim == 1 and len(test_data) == 5:
             number_of_detections = 1
         else:
             number_of_detections = 0
@@ -76,7 +76,15 @@ class Tester:
         results.append(number_of_detections)
 
         #Model = pd.read_csv(path_model, sep=' ', header=None, engine='c', float_precision='round_trip').values
-        Model = pd.read_csv(path_model, sep=' ', header=None, engine='c').values
+        #Model = pd.read_csv(path_model, sep=' ', header=None, engine='c').values
+        if path_model.rsplit('.', 1)[1] == 'txt':
+            Model = pd.read_csv(filepath_or_buffer=path_model, sep=' ', header=None, engine='c').values
+        elif path_model.rsplit('.', 1)[1] == 'npy':
+            Model = np.load(path_model)
+        else:
+            Model = None
+            print('unknown file type')
+
         """
         Model = np.empty_like(Model0)
         np.copyto(Model, Model0)

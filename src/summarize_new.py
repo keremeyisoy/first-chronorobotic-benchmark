@@ -18,10 +18,15 @@ def summarize(text_file_to_analyze):
     print('service social cost, servicing ratio 100%: ' + str(cummulative_kills[-1]))
     print('service social cost, servicing ratio 90%: ' + str(cummulative_kills[int(len(cummulative_kills)*0.9)]))
     print('service social cost, servicing ratio 50%: ' + str(cummulative_kills[int(len(cummulative_kills)*0.5)]))
+    print('expected encounters: ' + str(np.sum(cummulative_kills)/len(cummulative_kills)))
 
     plt.plot(cummulative_kills)
     plt.savefig(text_file_to_analyze + '.png')
     plt.close()
+    # return
+
+
+"""
 
     # POKUS SPECIFICKY PRO DATA !!!
     part_len = 20  # this times 40 seconds
@@ -50,3 +55,5 @@ def summarize(text_file_to_analyze):
     print('improved service social cost, servicing ratio 100%: ' + str(cummulative_kills[-1]))
     print('improved service social cost, servicing ratio 90%: ' + str(cummulative_kills[int(len(cummulative_kills)*0.9)]))
     print('improved service social cost, servicing ratio 50%: ' + str(cummulative_kills[int(len(cummulative_kills)*0.5)]))
+
+"""

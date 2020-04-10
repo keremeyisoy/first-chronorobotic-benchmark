@@ -88,6 +88,7 @@ class PathFinder:
 
 
     def extract_trajectory(self, start_time, speed, create_video=False, time_step=0.1):
+        directions = [0.0, np.pi / 4, np.pi / 2, 3 * np.pi / 4, np.pi, -3 * np.pi / 4, -np.pi / 2, -np.pi / 4]
         self.trajectory = []
         time = start_time
         for i in xrange(1, self.shortest_path_real.shape[0]):
@@ -100,12 +101,37 @@ class PathFinder:
             y = self.shortest_path_real[i - 1, 1]
             times = np.arange(time, time_next, time_step)
             # print time_next - time
-            x_step = (self.shortest_path_real[i, 0] - x)/len(times)
-            y_step = (self.shortest_path_real[i, 1] - y)/len(times)
+            x_diff = self.shortest_path_real[i, 0] - x
+            y_diff = self.shortest_path_real[i, 1] - y
+            # length of step
+            x_step = (x_diff)/len(times)
+            y_step = (y_diff)/len(times)
+            ## angle
+            #if x_diff == 0 and y_diff == -0.5:
+            #    angle = directions[0]
+            #elif x_diff == 0.5 and y_diff == -0.5:
+            #    angle = directions[1]
+            #elif x_diff == 0.5 and y_diff == 0:
+            #    angle = directions[2]
+            #elif x_diff == 0.5 and y_diff == 0.5:
+            #    angle = directions[3]
+            #elif x_diff == 0 and y_diff == 0.5:
+            #    angle = directions[4]
+            #elif x_diff == -0.5 and y_diff == 0.5:
+            #    angle = directions[5]
+            #elif x_diff == -0.5 and y_diff == 0:
+            #    angle = directions[6]
+            #elif x_diff == -0.5 and y_diff == -0.5:
+            #    angle = directions[7]
+            #else:
+            #    print('diffs are different')
+            #    print('x_diff: ' + str(x_diff))
+            #    print('y_diff: ' + str(y_diff))
             for t in times:
                 x = x + x_step
                 y = y + y_step
                 self.trajectory.append((t, x, y, 2, 2))
+                #self.trajectory.append((t, x, y, 2, 2, angle))
 
             time = time_next
         if create_video:
@@ -132,7 +158,10 @@ class PathFinder:
 
 
     def extract_interactions(self, data, radius, create_video=False, time_step=0.1):
-        interactions = []
+        radius2 = radius * radius
+        #interactions = []
+        #intensity = 0  # TODO?
+        interactions = 0
         counter = 0
         if data.ndim != 2:
             return 0
@@ -142,20 +171,28 @@ class PathFinder:
 
             if no > 0:
                 tmp = data[tmp, :]  # numpy version
-                dists = np.sqrt(np.sum((tmp[:, 1:3] - position[1:3])**2, axis=1))
-                tmp = tmp[dists <= radius, :]
-                interactions.append(tmp)
+                #dists = np.sqrt(np.sum((tmp[:, 1:3] - position[1:3])**2, axis=1))
+                #tmp = tmp[dists <= radius, :]
+                dists = np.sum((tmp[:, 1:3] - position[1:3])**2, axis=1)
+                #tmp = tmp[dists <= radius2, :]
+                #interactions.append(tmp)
+                #tmp = tmp[dists <= radius2, 3]
+                #intensity += self._angle_weight(tmp, position[5])
+                interactions += np.sum(dists <= radius2)
             
-        if interactions != []:
-            interactions = np.vstack(interactions)
-
-        if create_video:
-            np.savetxt('../results/interactions.txt', np.array(interactions))
-        counter = len(interactions)
-        if counter > 0:
-            return len(np.unique(np.array(interactions)[:, 3]))
-        else:
-            return 0
+        #if interactions != []:
+        #    interactions = np.vstack(interactions)
+        #
+        #if create_video:
+        #    np.savetxt('../results/interactions.txt', np.array(interactions))
+        #counter = len(interactions)
+        #if counter > 0:
+        #    #return len(np.unique(np.array(interactions)[:, 4]))
+        #    return len(interactions)
+        #else:
+        #    return 0
+        #return intensity
+        return interactions
 
 
     def get_mean_path_weight(self):
@@ -164,7 +201,16 @@ class PathFinder:
             weight = self.graph.get_edge_data(self.shortest_path[i], self.shortest_path[i+1])
             if weight != None:
                 total_weight += weight['weight']
+                #if weight['weight'] > total_weight:
+                #    total_weight = weight['weight']
 
-        return total_weight/len(self.shortest_path)
+        #return total_weight/len(self.shortest_path)
+        return total_weight
 
+
+    def _angle_weight(self, A, b):
+        C = A - b
+        C = (C + np.pi)%(2.0*np.pi) - np.pi
+        C = np.abs(C)/np.pi
+        return 2.0*np.sum(C)
 
