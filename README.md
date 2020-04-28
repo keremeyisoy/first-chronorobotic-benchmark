@@ -1,6 +1,6 @@
 # first-chronorobotic-benchmark
 
-git clone -b development --single-branch https://github.com/keremeyisoy/first-chronorobotic-benchmark
+git clone -b txy --single-branch https://github.com/keremeyisoy/first-chronorobotic-benchmark
 
 **what to do**
 
