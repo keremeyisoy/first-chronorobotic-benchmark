@@ -4,6 +4,8 @@ import tester
 import summarize_new
 import os
 
+import path_finder_new as pf
+
 """
 Before run this, please create new directories with your models name inside following directories; 'models' and 'results'
 and, change the variable 'model' with the same name of the directories you created.
@@ -25,6 +27,8 @@ list of values; [testing_time, number_of_detections_in_testing_data, interaction
 
 Since this code is prepared in a short time for scientific reasons, sorry in advance for any ambiguity
 """
+
+
 
 tester = tester.Tester(radius_of_robot=1.)
 
@@ -59,10 +63,10 @@ times = np.loadtxt('../data/test_times.txt', dtype='int')
 #models = ['chiF_1_clusters_0_periodicities', 'chiF_2_clusters_0_periodicities', 'chiF_3_clusters_0_periodicities', 'chiF_1_clusters_1_periodicities', 'chiF_2_clusters_1_periodicities', 'chiF_3_clusters_1_periodicities', 'chiF_1_clusters_2_periodicities', 'chiF_2_clusters_2_periodicities', 'chiF_3_clusters_2_periodicities', 'chiF_1_clusters_3_periodicities', 'chiF_2_clusters_3_periodicities', 'chiF_3_clusters_3_periodicities', 'chiF_1_clusters_4_periodicities', 'chiF_2_clusters_4_periodicities', 'chiF_3_clusters_4_periodicities']
 models = ['published_ral_3_clusters_3_periodicities', 'published_cliffmap_model_pq', 'published_predictions_stef_euc_o2', 'ral_variant_3_clusters_2_periodicities', 'model_daily_histogram', 'model_segment_means', 'model_weekly_histogram', 'model_prophet']
 models = ['RAL2020_3_clusters_3_periodicities']
-models = ['occ_grid']
+#models = ['occ_grid']
 
 
-result_dir = 'some_output'
+result_dir = 'testing_speed'
 model_dir = '/home/tom/pro/my/whyte_branches/2020_test_for_icra_RAL/models'
 
 

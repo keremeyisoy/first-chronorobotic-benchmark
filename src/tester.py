@@ -25,7 +25,7 @@ class Tester:
         :param create_video: create a video of trajectory if it is True
         :return: list of values; [testing_time, number_of_detections_in_testing_data, interactions_of_dummy_model_clockwise, interactions_of_dummy_model_counterclockwise, interactions_of_real_model_clockwise, interactions_of_real_model_counterclockwise, total_weight_in_clockwise, total_weight_in_counterclockwise, total_interactions_of_chosen_trajectory]
         '''
-        #start = time()
+        start = time()
         results = []
         #with warnings.catch_warnings():
             #warnings.simplefilter("ignore")
@@ -47,6 +47,11 @@ class Tester:
         try:
             #test_data = pd.read_csv(path_data, sep=' ', header=None, engine='c', float_precision='round_trip', usecols=[0, 1, 2, 7]).values#float_precision='round-trip' returns exatly what numpy
             test_data = pd.read_csv(path_data, sep=' ', header=None, engine='c', usecols=[0, 1, 2, 6, 7]).values#float_precision='round-trip' returns exatly what numpy
+            """
+            np.save(path_data + '.npy', test_data) #!!! bacha, pro test! :)
+            test_data = np.load(path_data + '.npy') #!!! bacha, pro test! :)
+            """
+
         #except pd.parser.CParserError:
         except pandas.io.common.EmptyDataError:
             test_data = np.array([])
@@ -72,18 +77,31 @@ class Tester:
         #walls = np.loadtxt(path_borders)
         #walls = pd.read_csv(path_borders, sep=' ', header=None, engine='c', float_precision='round_trip').values#float_precision='round-trip' returns exatly what numpy
         walls = pd.read_csv(path_borders, sep=' ', header=None, engine='c').values#float_precision='round-trip' returns exatly what numpy
+        ###np.save(path_borders + '.npy', walls) #!!! bacha, pro test! :)
+        """
+        walls = np.load(path_borders + '.npy') #!!! bacha, pro test! :)
+        """
+
         results.append(int(testing_time))
         results.append(number_of_detections)
 
         #Model = pd.read_csv(path_model, sep=' ', header=None, engine='c', float_precision='round_trip').values
         #Model = pd.read_csv(path_model, sep=' ', header=None, engine='c').values
+        """
         if path_model.rsplit('.', 1)[1] == 'txt':
             Model = pd.read_csv(filepath_or_buffer=path_model, sep=' ', header=None, engine='c').values
+            np.save(path_model + '.npy', Model) #!!! bacha, pro test! :)
         elif path_model.rsplit('.', 1)[1] == 'npy':
             Model = np.load(path_model)
         else:
             Model = None
             print('unknown file type')
+        """
+        Model = np.load(path_model + '.npy') #!!! bacha, pro test! :)
+
+
+
+
 
         """
         Model = np.empty_like(Model0)
@@ -99,10 +117,16 @@ class Tester:
         print(np.allclose(Model,Model0))
         """
 
-        #path_finder = pf.PathFinder(path=path_model, edges_of_cell=edges_of_cell)
-        path_finder = pf.PathFinder(model_data=Model, edges_of_cell=edges_of_cell)
-        #finish = time()
-        #print('first part: ' + str(finish-start))
+        path_edges = '../data/graph_basic.txt'
+        tmp = pf.PathFinder(model_data=Model, edges_of_cell=edges_of_cell)
+        graph = tmp.create_graph(path_edges)
+
+
+
+        #tmp = pf.PathFinder(path=path_model, edges_of_cell=edges_of_cell)
+        path_finder = pf.PathFinder(model_data=Model, edges_of_cell=edges_of_cell, graph=graph)
+        finish = time()
+        print('first part: ' + str(finish-start))
 
         '''
         Dummy Model
@@ -128,46 +152,45 @@ class Tester:
         '''
         #start_all = time()
 
+        """
+        start = time()
+        path_finder.update_graph()
+        finish = time()
+        print('update_graph')
+        print(finish-start)
+        """
 
-        #start = time()
-        path_finder.creat_graph()
-        #finish = time()
-        #print('creat_graph')
-        #print(finish-start)
-
-        #start = time()
+        start = time()
         path_finder.remove_walls(walls)
-        #finish = time()
-        #print('remove_walls')
-        #print(finish-start)
+        finish = time()
+        print('remove_walls')
+        print(finish-start)
 
-        #start = time()
-
+        start = time()
         # clockwise
         path_finder.find_shortest_path(route=route)
-        #finish = time()
-        #print('find_shortest_path')
-        #print(finish-start)
+        finish = time()
+        print('find_shortest_path')
+        print(finish-start)
 
-        #start = time()
+        start = time()
         weight_1 = path_finder.get_mean_path_weight()
-        #finish = time()
-        #print('get_mean_path_weight')
-        #print(finish-start)
+        finish = time()
+        print('get_mean_path_weight')
+        print(finish-start)
 
-        #start = time()
-
+        start = time()
         path_finder.extract_trajectory(min_time, speed=speed, create_video=create_video)
-        #finish = time()
-        #print('extract_trajectory')
-        #print(finish-start)
+        finish = time()
+        print('extract_trajectory')
+        print(finish-start)
 
-        #start = time()
+        start = time()
         result_1 = path_finder.extract_interactions(test_data, radius=self.radius_of_robot, create_video=create_video)
         results.append(result_1)
-        #finish = time()
-        #print('extract_interactions')
-        #print(finish-start)
+        finish = time()
+        print('extract_interactions')
+        print(finish-start)
 
 
         # counter-clockwise
